@@ -226,33 +226,43 @@ visualize_policy_with_show_render(env, optimal_policy_vi)
 # Анімація проходження оптимальної політики
 import time
 
-def animate_policy(env, policy, delay=0.7):
+from IPython.display import clear_output
+import time
+
+def animate_policy_single_frame(env, policy, delay=0.5):
     obs, info = env.reset()
     done = False
 
-    # Показуємо стартову позицію
-    frame = env.render()
-    if isinstance(frame, tuple):
-        frame = frame[0]
-    show_render(frame)
-    time.sleep(delay)
+    plt.figure(figsize=(4,4))
 
     while not done:
-        action = int(policy[obs])
-        obs, reward, terminated, truncated, info = env.step(action)
-        done = terminated or truncated
+        clear_output(wait=True)
 
         frame = env.render()
         if isinstance(frame, tuple):
             frame = frame[0]
 
-        show_render(frame)
+        plt.imshow(frame)
+        plt.axis('off')
+        plt.title(f"State: {obs}")
+        plt.show()
+
         time.sleep(delay)
 
-        if done:
-            break
+        action = int(policy[obs])
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
 
-    print("Епізод завершено. Винагорода:", reward)
+    # фінальний кадр
+    clear_output(wait=True)
+    frame = env.render()
+    if isinstance(frame, tuple):
+        frame = frame[0]
 
-animate_policy(env, optimal_policy_vi, delay=0.7)
+    plt.imshow(frame)
+    plt.axis('off')
+    plt.title(f"Final state: {obs}, reward={reward}")
+    plt.show()
+
+animate_policy_single_frame(env, optimal_policy_vi, delay=0.3)
 
