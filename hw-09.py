@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
 # import gym
 try:
@@ -32,7 +31,17 @@ env = gym.make(
     is_slippery=True,
     render_mode="rgb_array"
 )
+
 state = env.reset()
+
+frame = env.render()
+
+# Якщо render повернув (img, info)
+if isinstance(frame, tuple):
+    frame = frame[0]
+
+show_render(frame)
+
 
 # Перевіримо базову інформацію
 print("Кількість станів:", env.observation_space.n)
@@ -163,4 +172,17 @@ print("\nПолітика (Policy Iteration):")
 print_policy(optimal_policy_pi)
 
 
+for step in range(20):
+    action = env.action_space.sample()
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    frame = env.render()
+    if isinstance(frame, tuple):
+        frame = frame[0]
+
+    print(f"Крок {step}, дія {action}, стан {obs}, винагорода {reward}")
+    show_render(frame)
+
+    if terminated or truncated:
+        break
 
