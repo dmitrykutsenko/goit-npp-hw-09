@@ -186,3 +186,73 @@ for step in range(20):
     if terminated or truncated:
         break
 
+
+#Візуалізація оптимальної політики поверх FrozenLake
+
+def visualize_policy_with_show_render(env, policy):
+    # Отримуємо базове зображення FrozenLake
+    frame = env.render()
+    if isinstance(frame, tuple):
+        frame = frame[0]
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    ax.imshow(frame)
+    ax.axis('off')
+
+    arrows = {0: '←', 1: '↓', 2: '→', 3: '↑'}
+    grid = int(np.sqrt(env.observation_space.n))
+
+    # Малюємо стрілки політики
+    for state in range(env.observation_space.n):
+        row = state // grid
+        col = state % grid
+        action = int(policy[state])
+        arrow = arrows[action]
+
+        ax.text(
+            col * (frame.shape[1] / grid) + 20,
+            row * (frame.shape[0] / grid) + 35,
+            arrow,
+            fontsize=20,
+            color='red',
+            fontweight='bold'
+        )
+
+    plt.show()
+
+visualize_policy_with_show_render(env, optimal_policy_vi)
+
+
+# Анімація проходження оптимальної політики
+import time
+
+def animate_policy(env, policy, delay=0.7):
+    obs, info = env.reset()
+    done = False
+
+    # Показуємо стартову позицію
+    frame = env.render()
+    if isinstance(frame, tuple):
+        frame = frame[0]
+    show_render(frame)
+    time.sleep(delay)
+
+    while not done:
+        action = int(policy[obs])
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
+
+        frame = env.render()
+        if isinstance(frame, tuple):
+            frame = frame[0]
+
+        show_render(frame)
+        time.sleep(delay)
+
+        if done:
+            break
+
+    print("Епізод завершено. Винагорода:", reward)
+
+animate_policy(env, optimal_policy_vi, delay=0.7)
+
